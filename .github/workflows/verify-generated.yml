@@ -1,0 +1,25 @@
+name: verify-generated-feed
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: hermes-labs-ai/plugins
+          path: .canonical-plugins
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: >-
+          node .canonical-plugins/scripts/generate.mjs
+          --only-compat
+          --compat-output .claude-plugin/marketplace.json
+      - run: git diff --exit-code -- .claude-plugin/marketplace.json
